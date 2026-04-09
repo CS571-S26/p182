@@ -9,6 +9,7 @@ export default function GamePage() {
   const winning_word = "PERRO";
   const request_hint = "Es una animal muy popular! It is a very popular animal! It begins with a P!";
   //setting up the board
+  
   const [guesses, setGuesses] = useState(Array.from({length: total_guesses}, () => Array(length).fill("")));
 
   //setting up the rows and managing the current row and column
