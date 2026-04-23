@@ -3,13 +3,17 @@ import { Outlet } from "react-router";
 
 import SpanishNavbar from "./nav/SpanishNavbar";
 
+import SpanishWordleProvider from "./contexts/SpanishWordleContext";
+
 export default function Wordle() {
     return(
-        <div>
-            <SpanishNavbar />
+        <SpanishWordleProvider>
+            <div>
+                <SpanishNavbar />
             <div style = {{margin: "1rem"}}>
                 <Outlet />
             </div>
         </div>
+        </SpanishWordleProvider>
     )
 }

@@ -14,6 +14,7 @@ export default function SpanishNavbar() {
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Inicio (Home)</Nav.Link>
             <Nav.Link as={Link} to="/game">Jugar (Begin)</Nav.Link>
+            <Nav.Link as={Link} to="/settings">Ajustes (Settings)</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
