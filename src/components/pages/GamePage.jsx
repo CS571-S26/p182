@@ -3,11 +3,16 @@ import { Row } from "react-bootstrap";
 import {useContext} from "react";
 import {SpanishWordleContext} from "../contexts/SpanishWordleContext";
 
+import GuessGrid from "../game/GuessGrid";
+import GameOverModal from "../game/GameOverModal";
+
 export default function GamePage() {
   
+  const {getWord, colorBlind, maxGuesses} = useContext(SpanishWordleContext);
 
 
-  const total_guesses = 6;
+  //now dyanmic for total guesses
+  const total_guesses = maxGuesses;
   const length = 5;
 
   //const winning_word = "PERRO";
@@ -28,9 +33,14 @@ export default function GamePage() {
 
 
   //grabbing word information from context
-  const {getWord} = useContext(SpanishWordleContext);
+  //const {getWord} = useContext(SpanishWordleContext);
 
   const [winning_word, setWinningWord] = useState(() => getWord());
+
+
+  //setting up the game over modal
+  const [showModal, setShowModal] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
 
   const resetingGame = () => {
     //set everything back to the original state
@@ -46,6 +56,10 @@ export default function GamePage() {
 
     //grab new word 
     setWinningWord(getWord());
+
+    //close the modal
+    setShowModal(false);
+    setGameWon(false);
   }
 
 
@@ -95,8 +109,10 @@ export default function GamePage() {
     //if the user has won, alert
     if (currentGuess === winning_word) {
       setTimeout(() => {
-        alert("Enhorabuena! You won!!! The word is " + winning_word + "!");
-        resetingGame();
+        //alert("Enhorabuena! You won!!! The word is " + winning_word + "!");
+        //();
+        setGameWon(true);
+        setShowModal(true);
 
       }, 250);
       return;
@@ -105,8 +121,11 @@ export default function GamePage() {
     //if the user has not won and used all guesses
     if (currentRow === total_guesses - 1) {
       setTimeout(() => {
-        alert("Game Over! La palaba era " + winning_word + "!");
-        resetingGame();
+        //alert("Game Over! La palaba era " + winning_word + "!");
+        setGameWon(false);
+        setShowModal(true);
+        //resetingGame();
+
       }, 250);
       return;
     }
@@ -148,6 +167,11 @@ export default function GamePage() {
 
 
   const insertColors = (guess) => {
+
+
+    const correctColor = colorBlind ? "blue" : "green";
+    const presentColor = colorBlind ? "orange" : "goldenrod";
+
     const result = Array(length).fill("gray");
     const winningWordArray = winning_word.split("");
     const guessArray = guess.split("");
@@ -157,7 +181,7 @@ export default function GamePage() {
 
       if (letter === winningWordArray[index]) {
 
-        result[index] = "green";
+        result[index] = correctColor;
 
         winningWordArray[index] = null;
         guessArray[index] = null;
@@ -172,7 +196,7 @@ export default function GamePage() {
       const winningIndex = winningWordArray.indexOf(letter);
 
       if (winningIndex !== -1) {
-        result[index] = "goldenrod";
+        result[index] = presentColor;
         winningWordArray[winningIndex] = null;
       }
     });
@@ -185,7 +209,7 @@ export default function GamePage() {
   return (
 
     
-    <div style = {{textAlign: "center", marginTop: "30px", outline: "none"}} onKeyDown = {handleKeyEnter} tabIndex = "0">
+    <div style = {{textAlign: "center", marginTop: "30px", outline: "none"}} onKeyDown = {handleKeyEnter} tabIndex = "0" role = "application" aria-label = "Wordle game board, enter your guesses here with your keyboard.">
 
 
 
@@ -204,26 +228,18 @@ export default function GamePage() {
       <p>To begin! Enter a letter below! </p>
       <p>Para comenzar, entrar una letra en la caja!</p>
 
-      <div style = {{marginTop: "1rem"}}>
-        
-        {guesses.map((row, rowIndex) => (
-          <div key = {rowIndex} style = {{marginBottom: "5px"}}>
+      <GuessGrid
+        guesses={guesses}
+        colors={colors}
+        animatedRows={animatedRows}
+      />
 
-            {row.map((letter, colIndex) => (
-              <span key = {colIndex} style = {boxStyling(rowIndex, colIndex)} className = {animatedRows.includes(rowIndex) ? "flip" : ""}> 
-                {letter}
-              </span>
-            ))}
-
-          </div>
-
-        ))}
-
-      </div>
-
-      <button onClick={() => alert(request_hint)} style = {{ marginBottom: "1rem", marginTop: "1rem"}}>
-        Hint!
-      </button>
+      <GameOverModal
+        show={showModal}
+        won={gameWon}
+        winningWord={winning_word}
+        onRestart={resetingGame}
+      />
 
 
 
